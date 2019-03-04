@@ -1,5 +1,7 @@
 package log;
 
+import gui.LogWindow;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -31,6 +33,10 @@ public class LogWindowSource
     {
         synchronized(m_listeners)
         {
+            //это должно удалять первого слушателя, если превышено кол-во слушателей
+            if (m_listeners.size() > m_iQueueLength){
+                unregisterListener(m_listeners.get(0));
+            }
             m_listeners.add(listener);
             m_activeListeners = null;
         }
@@ -43,6 +49,10 @@ public class LogWindowSource
             m_listeners.remove(listener);
             m_activeListeners = null;
         }
+    }
+
+    public Boolean isContains(LogWindow logWin){
+        return m_listeners.contains(logWin);
     }
 
     public void append(LogLevel logLevel, String strMessage)
