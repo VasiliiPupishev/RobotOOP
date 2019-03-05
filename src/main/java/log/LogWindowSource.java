@@ -33,10 +33,6 @@ public class LogWindowSource
     {
         synchronized(m_listeners)
         {
-            //это должно удалять первого слушателя, если превышено кол-во слушателей
-            if (m_listeners.size() > m_iQueueLength){
-                unregisterListener(m_listeners.get(0));
-            }
             m_listeners.add(listener);
             m_activeListeners = null;
         }
@@ -58,6 +54,9 @@ public class LogWindowSource
     public void append(LogLevel logLevel, String strMessage)
     {
         LogEntry entry = new LogEntry(logLevel, strMessage);
+        if (m_iQueueLength < m_messages.size()){
+                m_messages.remove(0);
+        }
         m_messages.add(entry);
         LogChangeListener [] activeListeners = m_activeListeners;
         if (activeListeners == null)
