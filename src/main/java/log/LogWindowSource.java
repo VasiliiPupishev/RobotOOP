@@ -54,7 +54,7 @@ public class LogWindowSource
     public void append(LogLevel logLevel, String strMessage)
     {
         LogEntry entry = new LogEntry(logLevel, strMessage);
-        if (m_iQueueLength < m_messages.size()){
+        if (m_iQueueLength <= m_messages.size()){
                 m_messages.remove(0);
         }
         m_messages.add(entry);

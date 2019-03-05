@@ -46,8 +46,15 @@ public class MenuBar extends JMenuBar
                 KeyEvent.VK_Q, ActionEvent.ALT_MASK));
         menuItem.setActionCommand("quit");
         menuItem.addActionListener((event) -> {
-            this.ApplicationFrame.setVisible(false);
-            this.ApplicationFrame.dispose();
+            Object[] options = { "Да", "Нет!" };
+            int n = JOptionPane.showOptionDialog(this, "Закрыть окно?",
+                    "Подтверждение", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (n == 0) {
+                this.ApplicationFrame.setVisible(false);
+                this.ApplicationFrame.dispose();
+                System.exit(0);
+            }
         });
 
         menu.add(menuItem);
