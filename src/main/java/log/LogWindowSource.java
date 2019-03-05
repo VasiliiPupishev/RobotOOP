@@ -33,10 +33,7 @@ public class LogWindowSource
     {
         synchronized(m_listeners)
         {
-            //это должно удалять первого слушателя, если превышено кол-во слушателей
-            if (m_listeners.size() > m_iQueueLength){
-                unregisterListener(m_listeners.get(0));
-            }
+            unregisterListener(m_listeners.get(0));
             m_listeners.add(listener);
             m_activeListeners = null;
         }
