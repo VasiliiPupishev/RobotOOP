@@ -1,17 +1,20 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.TextArea;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener
+public class LogWindow extends JInternalFrame implements LogChangeListener, VetoableChangeListener, Settable
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
@@ -22,13 +25,14 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
-        m_logContent.setSize(200, 500);
+        m_logContent.setSize(400, 500);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
         updateLogContent();
+        addVetoableChangeListener(this);
     }
 
     private void updateLogContent()
@@ -47,4 +51,56 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     {
         EventQueue.invokeLater(this::updateLogContent);
     }
+
+    @Override
+    public void windowClosing(WindowEvent we) {
+        m_logSource.unregisterListener(this);
+        System.out.println("aaaaaaaaaaaaaaaaaa");
+    }
+
+    public void vetoableChange(PropertyChangeEvent pce)
+            throws PropertyVetoException {
+        if (pce.getPropertyName().equals(IS_CLOSED_PROPERTY)) {
+            boolean changed = (Boolean) pce.getNewValue();
+            if (changed) {
+                int option = JOptionPane.showOptionDialog(this, "Close " +
+                                getTitle() + "?",
+                        "Close Confirmation",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null, null, null);
+                if (option != JOptionPane.YES_OPTION) {
+                    m_logSource.unregisterAllListener();
+                    throw new PropertyVetoException("Cancelled",null);
+                }
+            }
+        }
+    }
+
+    private Object writeReplace() {
+        int state = isIcon() ? 1 : 0;
+        System.out.println("Log window state " + state);
+        Point location = isIcon() ? null : getLocation();
+        System.out.println("Log window position " + location);
+        return new Settings(getSize(), location, state, getClass().getSimpleName());
+    }
+
+    public void setSettings(Settings settings) {
+        if (settings.state == 1) {
+            try {
+                setIcon(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();
+            }
+        }
+        if (settings.location == null) {
+            setSize(settings.screenSize);
+        } else {
+            setBounds(settings.location.x, settings.location.y,
+                    settings.screenSize.width,
+                    settings.screenSize.height);
+        }
+    }
+
+
 }

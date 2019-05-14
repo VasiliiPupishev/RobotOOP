@@ -16,7 +16,8 @@ public class RobotsProgram
         } catch (Exception e) {
             e.printStackTrace();
         }
-        SwingUtilities.invokeLater(() -> {MainApplicationFrame frame = new MainApplicationFrame();
+        SwingUtilities.invokeLater(() -> {
+            gui.MainApplicationFrame frame = new gui.MainApplicationFrame();
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
